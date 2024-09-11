@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "watch api",
+			"file": "C:\\Users\\user\\projects\\datting-app\\api\\api.csproj",
+			"problemMatcher": [],
+			"label": "dotnet: watch api"
+		}
+	]
+}
