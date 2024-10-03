@@ -15,14 +15,14 @@ export class AccountService {
     return this.http.post<User>(this.baseurl+'account/login' , model).pipe(
       map(user=>{
         if (user)
-        {
+        { 
             localStorage.setItem('user' , JSON.stringify(user));
             this.currentUser.set(user);
         }
       })
     )
   }
-  
+// added  
   register(model:any){
     return this.http.post<User>(this.baseurl+'account/register' , model).pipe(
       map(user=>{
