@@ -18,6 +18,7 @@ public class AutoMapperProfiles : Profile
 
         //from photo to photoDto
         CreateMap<Photo, PhotoDto>();
+        CreateMap<MemberUpdateDto, AppUser>();
     }
 
 }
