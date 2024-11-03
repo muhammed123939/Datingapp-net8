@@ -11,5 +11,6 @@ import { RouterLink } from '@angular/router';
 })
 export class MemberCardComponent {
   //member is just a signal
-member=input.required<Member>();
+
+  member=input.required<Member>();
 }

@@ -34,26 +34,29 @@ public class AccountController(DataContext context, ITokenService tokenService) 
      }
 
 
-    [HttpPost("login")]
+    [HttpPost("login")] //function 3mlt check login w b3tt check for login 
     public async Task<ActionResult<UserDto>> Login(loginDTo loginDTo)
     {
-        var user = await context.Users.FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDTo.Username.ToLower());
+        var user = await context.Users
+        .Include(p=>p.Photos ) //3shan tfw2 el database b relation
+        .FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDTo.Username.ToLower());//get first username exist
         if (user == null) return Unauthorized("invalid username");
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-        var computedhash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTo.Password));
+        using var hmac = new HMACSHA512(user.PasswordSalt);//5at salt mn database
+        var computedhash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTo.Password));//compute hash elsalt m3 elpassword entered
         for (int i = 0; i < computedhash.Length; i++)
         {
-            if (computedhash[i] != user.PasswordHash[i]) return Unauthorized("invalid password !");
+            if (computedhash[i] != user.PasswordHash[i]) return Unauthorized("invalid password !");//karen password hash in db m3 computed hash
         }
-        return new UserDto
+           return new UserDto
         {
             Username = user.UserName,
-            Token = tokenService.CreateToken(user)
+            Token = tokenService.CreateToken(user) ,
+            photoUrl=user.Photos.FirstOrDefault(x=>x.IsMain)?.Url
         };
     }
     private async Task<bool> UserExists(string username)
     {
-        return await context.Users.AnyAsync(x => x.UserName.ToLower() == username.ToLower());
+        return await context.Users.AnyAsync(x => x.UserName.ToLower() == username.ToLower()); //check 3la kol el users
     }
 
 
