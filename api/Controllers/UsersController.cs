@@ -33,7 +33,7 @@ IphotoService photoService) : BaseApiController
 
         var user =await userRepository.GetUserByUsernameAsync(User.GetUsername());
         if(user==null)return BadRequest("could not find user");
-        mapper.Map(MemberUpdateDto , user);
+        mapper.Map(MemberUpdateDto , user); //7ot member update f user 
         if(await userRepository.SaveAllAsync()) return NoContent();
         return BadRequest("failed to update the user");   
     }
@@ -41,7 +41,7 @@ IphotoService photoService) : BaseApiController
     [HttpPost("add-photo")]
     public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
     {
-        //7atena await w zaharet photos l user line 54
+        //7atena await w zaharet photos l user line 54 , User interface updated after login 
         var user= await userRepository.GetUserByUsernameAsync(User.GetUsername());
         if(user==null) return BadRequest("cannot update user");
         var result=await photoService.AddPhotoAsync(file);
@@ -51,6 +51,9 @@ IphotoService photoService) : BaseApiController
             Url=result.SecureUrl.AbsoluteUri , 
             PublicId=result.PublicId
         };
+         
+        if(user.Photos.Count==0)photo.IsMain=true;
+
         user.Photos.Add(photo);
 
         if(await userRepository.SaveAllAsync()) 
@@ -77,13 +80,13 @@ IphotoService photoService) : BaseApiController
         [HttpDelete("delete-photo/{photoId:int}")]
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
-             var user = await userRepository.GetUserByUsernameAsync(User.GetUsername()); 
+            var user = await userRepository.GetUserByUsernameAsync(User.GetUsername()); //it take instance from database
             if(user==null) return BadRequest("could not find user");
             var photo = user.Photos.FirstOrDefault(x=>x.Id==photoId);
             if(photo==null||photo.IsMain) return BadRequest("this photo cannot be deleted");
             if(photo.PublicId!=null)
             {
-                var result= await photoService.DeletePhotoAsync(photo.PublicId);
+                var result= await photoService.DeletePhotoAsync(photo.PublicId); //photo deleted in cloudinary
                 if(result.Error!=null) return BadRequest(result.Error.Message);
             }
             user.Photos.Remove(photo);
